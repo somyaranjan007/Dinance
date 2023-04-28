@@ -3,11 +3,10 @@ pragma solidity ^0.8.7;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
+
 contract DinancePool {
     address public factory;
     address public token;
-
-    
 
     constructor() {
         factory = msg.sender;
