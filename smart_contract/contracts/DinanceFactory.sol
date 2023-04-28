@@ -18,7 +18,4 @@ contract DinanceFactory {
 
         IDinancePool(pool).initialize(_token);
     }
-
-
-
 }
