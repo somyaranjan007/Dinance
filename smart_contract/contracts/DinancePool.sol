@@ -3,7 +3,6 @@ pragma solidity ^0.8.7;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-
 contract DinancePool {
     address public factory;
     address public token;
@@ -17,10 +16,23 @@ contract DinancePool {
         token = _token;
     }
 
-    function deposit(address _token,uint256 _amount,address onBehalfOf) external {
-        IERC20(_token).approve(address(this),_amount);
-        IERC20(_token).transferFrom(msg.sender,address(this),_amount);
+    function createAToken(
+        address _token,
+        string memory _name,
+        string memory _symbol
+    ) internal {
+        AToken[_token] = new DinanceAToken(_token, _name, _symbol);
     }
 
-    
+    function deposit(
+        address _token,
+        uint256 _amount,
+        address onBehalfOf,
+        string memory _name,
+        string memory _symbol
+    ) external {
+        createAToken(_token, _name, _symbol);
+        IERC20(_token).transferFrom(msg.sender, address(this), _amount);
+        IERC20(AToken[_token]).mint(msg.sender, _amount);
+    }
 }
