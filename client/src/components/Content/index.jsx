@@ -5,6 +5,7 @@ import { TbAntennaBars5 } from "react-icons/tb"
 import Logo from "@/assets/Logo.png";
 
 const Content = () => {
+    
     return (
         <div className="bg-[#10111c] text-white h-[250px] px-28 flex justify-center items-start flex-col">
             <h1 className="text-[45px] font-semibold">Ethereum Market</h1>
