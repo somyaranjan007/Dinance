@@ -43,17 +43,21 @@ contract DinancePool {
         token = _token;
     }
 
-    function deposit(
-        address _token,
-        uint256 _amount
-    ) external {
+    function deposit(address _token, uint256 _amount) external {
         bool poolExist = pool.checkPool(_token);
         if (!poolExist) {
             revert PoolDoesntExist("You are depositing wrong token!");
         }
 
+        if (depositedTime[msg.sender] > 0) {
+            uint256 amountAfterInterest = ((block.timestamp -
+                depositedTime[msg.sender]) * interest);
+            depositor[msg.sender] += amountAfterInterest;
+        }
+
         depositor[msg.sender] += amount;
         depositedTime[msg.sender] = block.timestamp;
+
         IERC20(_token).transferFrom(msg.sender, address(this), _amount);
         IERC20(AToken[_token]).mint(msg.sender, _amount);
     }
@@ -61,8 +65,17 @@ contract DinancePool {
     function withdraw(address _token, uint256 _amount, address to) external {
         uint256 amountAfterInterest = ((depositedTime[msg.sender] -
             block.timestamp) * interest) + _amount;
+
         IERC20(AToken[_token].burn(to, _amount));
-        IERC20(_token).transfer(to, _amount);
+        IERC20(_token).transfer(to, amountAfterInterest);
+
+        depositor[msg.sender] -= _amount;
+
+        if (depositor[msg.sender] > 0) {
+            depositedTime[msg.sender] = block.timestamp;
+        } else {
+            depositedTime[msg.sender] = 0;
+        }
     }
 
     function borrow(
