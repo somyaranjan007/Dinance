@@ -11,8 +11,13 @@ contract DinancePool {
     address public token;
     address public factory;
     mapping(address => uint256) depositor;
-    mapping(adresss => uint256) depositedTime;
+    mapping(address => uint256) depositedTime;
+    mapping(address => uint256) borrower;
+    mapping(address => uint256) borrowedTime;
     mapping(address => DinanceAToken) AToken;
+
+    mapping(address => uint256) collateralAmount;
+    mapping(address => address) collateralToken;
 
     struct TokenProperty {
         address tokenAddress;
@@ -78,15 +83,48 @@ contract DinancePool {
         }
     }
 
+    function depositCollateral(
+        address _token, 
+        uint256 _amount
+    ) external {
+        bool poolExist = pool.checkPool(_token);
+        if (!poolExist) {
+            revert PoolDoesntExist("You are depositing wrong collateral!");
+        }
+
+        collateralAmount[msg.sender] = _amount;
+        collateralToken[msg.sender] = _token;
+
+        IERC20(_token).transferFrom(msg.sender, address(this), _amount);
+    }
+
     function borrow(
         address _token,
         uint256 _amount,
-        address onBehalfOf
-    ) external {}
+    ) external {
+        require(collateralAmount[msg.sender] > _amount; "You don't have enough amount!");
+        bool poolExist = pool.checkPool(_token);
+        if (!poolExist) {
+            revert PoolDoesntExist("You are borrowing wrong token!");
+        }
+
+        require(IERC20(_token).balanceOf(address(this)) >= _amount, "pool doesn't have enough tokens to borrow!");
+        borrowedTime[msg.sender] = block.timestamp;
+        borrower[msg.sender] = _amount;
+        IERC20(_token).transfer(msg.sender, _amount);
+    }
 
     function repay(
         address _token,
         uint256 _amount,
-        address onBehalfOf
-    ) external {}
+        address _account
+    ) external {
+        require(borrower[msg.sender] == _amount, "you don't have debt!");
+        IERC20(_token).transfer(address(this), _amount);
+
+        collateralAmount[msg.sender] = 0;
+        collateralToken[msg.sender] = address(0);
+        uint256 amountAfterInterest = collateralAmount[msg.sender] - ((block.timestamp - borrowedTime[msg.sender]) * borrowInterest);
+        IERC20(collateralToken[msg.sender]).transfer(msg.sender, amountAfterInterest);
+    }
 }
