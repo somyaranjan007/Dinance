@@ -67,6 +67,10 @@ contract DinancePool {
         IERC20(AToken[_token]).mint(msg.sender, _amount);
     }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> global_supply
     function withdraw(address _token, uint256 _amount, address to) external {
         uint256 amountAfterInterest = ((depositedTime[msg.sender] -
             block.timestamp) * interest) + _amount;
@@ -76,14 +80,15 @@ contract DinancePool {
 
         depositor[msg.sender] -= _amount;
 
-        if (depositor[msg.sender] > 0) {
-            depositedTime[msg.sender] = block.timestamp;
+        if (depositor[msg.sender] == 0) {
+            depositedTime[msg.sender] = 0;
         } else {
             depositedTime[msg.sender] = 0;
         }
 
     }
 
+<<<<<<< HEAD
 
     function depositCollateral(
         address _token, 
@@ -98,6 +103,14 @@ contract DinancePool {
         collateralToken[msg.sender] = _token;
 
         IERC20(_token).transferFrom(msg.sender, address(this), _amount);
+=======
+    function borrow(address _token,uint256 _amount,address onBehalfOf) external{
+        borrower[msg.sender]+=_amount;
+        borrowedTime[msg.sender]=block.timestamp;
+        //user will borrow from the deposited token
+        IERC20(_token).transfer(msg.sender,_amount);
+        //user will charge with the interest 
+>>>>>>> global_supply
     }
 
     function borrow(
