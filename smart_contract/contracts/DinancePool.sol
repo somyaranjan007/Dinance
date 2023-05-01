@@ -64,18 +64,7 @@ contract DinancePool {
         IERC20(AToken[_token]).mint(msg.sender, _amount);
     }
 
-<<<<<<< HEAD
 
-    function withdraw(address _token,uint256 _amount,address to) external{
-        require(depositor[msg.sender]>=_amount,"dont have any amount to withdraw");
-        uint256 amountAfterInterest=((depositedTime[msg.sender]-block.timestamp) * interest) + _amount;  
-        IERC20(AToken[_token].burn(to,_amount));
-        uint256 userAmount=depositer[msg.sender];
-        depositor[msg.sender]=0;
-        depositedTime[msg.sender]=0;
-        IERC20(_token).transfer(to,amountAfterInterest);
-
-=======
     function withdraw(address _token, uint256 _amount, address to) external {
         uint256 amountAfterInterest = ((depositedTime[msg.sender] -
             block.timestamp) * interest) + _amount;
@@ -85,12 +74,12 @@ contract DinancePool {
 
         depositor[msg.sender] -= _amount;
 
-        if (depositor[msg.sender] > 0) {
-            depositedTime[msg.sender] = block.timestamp;
+        if (depositor[msg.sender] == 0) {
+            depositedTime[msg.sender] = 0;
         } else {
             depositedTime[msg.sender] = 0;
         }
->>>>>>> b45565dc4ff5b1a168f10ac81edd7afb3801d82b
+
     }
 
     function borrow(address _token,uint256 _amount,address onBehalfOf) external{
@@ -99,7 +88,6 @@ contract DinancePool {
         //user will borrow from the deposited token
         IERC20(_token).transfer(msg.sender,_amount);
         //user will charge with the interest 
- 
     }
 
     function repay(address _token,uint256 _amount,address onBehalfOf) external {
