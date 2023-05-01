@@ -7,7 +7,7 @@ const Header = () => {
   const connectWallet = async () => {
     try {
       const provider = await detectEthereumProvider();
-
+      
       if (provider) {
         const account = await provider.request({
           method: "eth_requestAccounts",

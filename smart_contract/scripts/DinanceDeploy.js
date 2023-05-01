@@ -1,5 +1,7 @@
+const { ethers } = require("hardhat");
+
 const main = async () => {
-    console.log("Dinance Called!");
+    const 
 }
 
 main().then(() => process.exit(0)).catch((error) => {
