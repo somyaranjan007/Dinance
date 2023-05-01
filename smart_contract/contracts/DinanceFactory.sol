@@ -28,12 +28,12 @@ contract DinanceFactory {
         emit poolCreated(_token, pool, poolMarket.length);
     }
 
-    function checkPool(address _token) public returns(bool) {
-        for(uint256 i = 0; i < reserveTokens.length; i++){
-            if(reserveTokens[i] == _token) {
+    function checkPool(address _token) public returns (bool) {
+        for (uint256 i = 0; i < reserveTokens.length; i++) {
+            if (reserveTokens[i] == _token) {
                 poolExist = true;
                 break;
-            } 
+            }
         }
 
         return poolExist;

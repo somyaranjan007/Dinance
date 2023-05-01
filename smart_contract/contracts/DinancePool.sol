@@ -9,12 +9,15 @@ error PoolDoesntExist(string message);
 
 contract DinancePool {
     address public token;
-    mapping(address=>uint256) borrower;
-    mapping(address=>uint256) borrowedTime;
     address public factory;
     mapping(address => uint256) depositor;
-    mapping(adresss => uint256) depositedTime;
+    mapping(address => uint256) depositedTime;
+    mapping(address => uint256) borrower;
+    mapping(address => uint256) borrowedTime;
     mapping(address => DinanceAToken) AToken;
+
+    mapping(address => uint256) collateralAmount;
+    mapping(address => address) collateralToken;
 
     struct TokenProperty {
         address tokenAddress;
@@ -64,18 +67,6 @@ contract DinancePool {
         IERC20(AToken[_token]).mint(msg.sender, _amount);
     }
 
-<<<<<<< HEAD
-
-    function withdraw(address _token,uint256 _amount,address to) external{
-        require(depositor[msg.sender]>=_amount,"dont have any amount to withdraw");
-        uint256 amountAfterInterest=((depositedTime[msg.sender]-block.timestamp) * interest) + _amount;  
-        IERC20(AToken[_token].burn(to,_amount));
-        uint256 userAmount=depositer[msg.sender];
-        depositor[msg.sender]=0;
-        depositedTime[msg.sender]=0;
-        IERC20(_token).transfer(to,amountAfterInterest);
-
-=======
     function withdraw(address _token, uint256 _amount, address to) external {
         uint256 amountAfterInterest = ((depositedTime[msg.sender] -
             block.timestamp) * interest) + _amount;
@@ -90,21 +81,52 @@ contract DinancePool {
         } else {
             depositedTime[msg.sender] = 0;
         }
->>>>>>> b45565dc4ff5b1a168f10ac81edd7afb3801d82b
+
     }
 
-    function borrow(address _token,uint256 _amount,address onBehalfOf) external{
-        borrower[msg.sender]+=_amount;
-        borrowedTime[msg.sender]=block.timestamp;
-        //user will borrow from the deposited token
-        IERC20(_token).transfer(msg.sender,_amount);
-        //user will charge with the interest 
- 
+
+    function depositCollateral(
+        address _token, 
+        uint256 _amount
+    ) external {
+        bool poolExist = pool.checkPool(_token);
+        if (!poolExist) {
+            revert PoolDoesntExist("You are depositing wrong collateral!");
+        }
+
+        collateralAmount[msg.sender] = _amount;
+        collateralToken[msg.sender] = _token;
+
+        IERC20(_token).transferFrom(msg.sender, address(this), _amount);
     }
 
-    function repay(address _token,uint256 _amount,address onBehalfOf) external {
-        require(borrower[msg.sender]>=_amount,"you havent borrowed anytoken yet");
-        uint256 amountAfterInterestCharged=_amount - ((borrowedTime[msg.sender]-block.timestamp) * borrowInterest);         
+    function borrow(
+        address _token,
+        uint256 _amount
+    ) external {
+        require(collateralAmount[msg.sender] > _amount, "You don't have enough amount!");
+        bool poolExist = pool.checkPool(_token);
+        if (!poolExist) {
+            revert PoolDoesntExist("You are borrowing wrong token!");
+        }
+
+        require(IERC20(_token).balanceOf(address(this)) >= _amount, "pool doesn't have enough tokens to borrow!");
+        borrowedTime[msg.sender] = block.timestamp;
+        borrower[msg.sender] = _amount;
+        IERC20(_token).transfer(msg.sender, _amount);
     }
 
+    function repay(
+        address _token,
+        uint256 _amount,
+        address _account
+    ) external {
+        require(borrower[msg.sender] == _amount, "you don't have debt!");
+        IERC20(_token).transfer(address(this), _amount);
+
+        collateralAmount[msg.sender] = 0;
+        collateralToken[msg.sender] = address(0);
+        uint256 amountAfterInterest = collateralAmount[msg.sender] - ((block.timestamp - borrowedTime[msg.sender]) * borrowInterest);
+        IERC20(collateralToken[msg.sender]).transfer(msg.sender, amountAfterInterest);
+    }
 }
