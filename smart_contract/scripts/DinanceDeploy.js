@@ -1,7 +1,7 @@
 const { ethers } = require("hardhat");
 
 const main = async () => {
-    const 
+    const DinancePoolFactory = await ethers.getContractFactory("");
 }
 
 main().then(() => process.exit(0)).catch((error) => {

@@ -76,33 +76,19 @@ contract DinancePool {
 
         depositor[msg.sender] -= _amount;
 
-        if (depositor[msg.sender] > 0) {
-            depositedTime[msg.sender] = block.timestamp;
+        if (depositor[msg.sender] == 0) {
+            depositedTime[msg.sender] = 0;
         } else {
             depositedTime[msg.sender] = 0;
         }
+
     }
-
-    function depositCollateral(
-        address _token, 
-        uint256 _amount
-    ) external {
-        bool poolExist = pool.checkPool(_token);
-        if (!poolExist) {
-            revert PoolDoesntExist("You are depositing wrong collateral!");
-        }
-
-        collateralAmount[msg.sender] = _amount;
-        collateralToken[msg.sender] = _token;
-
-        IERC20(_token).transferFrom(msg.sender, address(this), _amount);
-    }
-
+    
     function borrow(
         address _token,
-        uint256 _amount,
+        uint256 _amount
     ) external {
-        require(collateralAmount[msg.sender] > _amount; "You don't have enough amount!");
+        require(collateralAmount[msg.sender] > _amount, "You don't have enough amount!");
         bool poolExist = pool.checkPool(_token);
         if (!poolExist) {
             revert PoolDoesntExist("You are borrowing wrong token!");
