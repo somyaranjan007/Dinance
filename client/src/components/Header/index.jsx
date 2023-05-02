@@ -33,6 +33,10 @@ const Header = () => {
     }
   };
 
+  const disConnectWallet = () => {
+    setMetaMaskAccount("");
+  }
+
 
   console.log(metaMaskAccount);
 
@@ -53,7 +57,10 @@ const Header = () => {
 
         {
           metaMaskAccount ? 
-          <button className="bg-blue-900 py-2 px-3 text-[15px] rounded">
+          <button 
+            onClick={disConnectWallet}
+            className="bg-blue-900 py-2 px-3 text-[15px] rounded"
+          >
             {`${metaMaskAccount.slice(0, -37)}...${metaMaskAccount.slice(metaMaskAccount.length-3, metaMaskAccount.length)}`}
           </button>
           :
