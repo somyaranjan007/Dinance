@@ -3,29 +3,53 @@ pragma solidity ^0.8.7;
 
 /* We are imporing DinancePool and Interface of DinancePool */
 import "./DinancePool.sol";
-import "./IDinancePool.sol";
+import "./DinanceAToken.sol";
+
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 /* This is Dinance Factory Contract for making Dinance pool */
 contract DinanceFactory {
-    address[] public poolMarket;
     address[] public reserveTokens;
+    address[] public poolMarket;
+
+    DinancePool public DinancePoolContract;
+    DinanceAToken public dinanceAToken;
+
+    mapping(address => DinancePool) public DinancePoolAddress;
+    mapping(address => DinanceAToken) public AToken;
+
+    uint256 public totalAmount;
+
+    struct TokenProperty {
+        address tokenAddress;
+        string name;
+        string symbol;
+    }
+
     bool public poolExist;
 
     event poolCreated(address _token, address pool, uint poolLength);
 
-    function createPool(address _token) public returns (address pool) {
-        reserveTokens.push(_token);
-        bytes memory bytecode = type(DinancePool).creationCode;
-        bytes32 salt = keccak256(abi.encodePacked(_token));
+    constructor(TokenProperty[] memory _tokenPools) {
+        for (uint256 i = 0; i < _tokenPools.length; i++) {
+            reserveTokens.push(_tokenPools[i].tokenAddress);
 
-        assembly {
-            pool := create2(0, add(bytecode, 32), mload(bytecode), salt)
+            DinancePoolContract = new DinancePool();
+            DinancePoolContract.initialize(_tokenPools[i].tokenAddress);
+
+            poolMarket.push(address(DinancePoolContract));
+            DinancePoolAddress[_tokenPools[i].tokenAddress] = DinancePoolContract;
+
+            dinanceAToken = new DinanceAToken(
+                _tokenPools[i].tokenAddress,
+                _tokenPools[i].name,
+                _tokenPools[i].symbol
+            );
+
+            AToken[_tokenPools[i].tokenAddress] = dinanceAToken;
+
+            emit poolCreated(_tokenPools[i].tokenAddress, address(DinancePoolContract), poolMarket.length);
         }
-
-        IDinancePool(pool).initialize(_token);
-        poolMarket.push(pool);
-
-        emit poolCreated(_token, pool, poolMarket.length);
     }
 
     function checkPool(address _token) public returns (bool) {
@@ -37,5 +61,13 @@ contract DinanceFactory {
         }
 
         return poolExist;
+    }
+
+    function totalSupply() public returns(uint256) {
+        for(uint256 i = 0; i < poolMarket.length; i++) {
+            totalAmount += IERC20(reserveTokens[i]).balanceOf(poolMarket[i]);
+        }
+
+        return totalAmount;
     }
 }
