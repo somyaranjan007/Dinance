@@ -7,7 +7,7 @@ export default function Home() {
     <Layout>
       <Content />
       <UserSupply />
-      <GlobalSupply/>
+      <GlobalSupply />
     </Layout>
   )
 }

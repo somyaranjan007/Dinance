@@ -1,4 +1,4 @@
-import React, {} from "react";
+import React, { } from "react";
 import Logo from "@/assets/Logo.png";
 import { ethers } from "ethers";
 import detectEthereumProvider from "@metamask/detect-provider";
@@ -22,7 +22,7 @@ const Header = () => {
     }
   };
   return (
-    <div className="flex items-center justify-between px-2 h-[70px] pr-4">
+    <div className="flex items-center justify-between px-2 h-[70px] pr-4 bg-[#21232f] text-white">
       <div className="flex items-center">
         <img src={Logo.src} alt="" className="w-[50px]" />
         <h1 className="text-[35px]">Dinance</h1>
