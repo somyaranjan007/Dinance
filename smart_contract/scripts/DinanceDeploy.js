@@ -26,11 +26,11 @@ const main = async () => {
     ]
 
     const DinanceFactory = await ethers.getContractFactory("DinanceFactory");
-    const DinanceFac = await DinanceFactory.deploy(poolToken);
+    const Dinance = await DinanceFactory.deploy(poolToken);
 
-    await DinanceFac.deployed();
+    await Dinance.deployed();
 
-    console.log(DinanceFac.address);
+    console.log(`Dinance Factory: ${Dinance.address}`);
 }
 
 main().then(() => process.exit(0)).catch((error) => {
