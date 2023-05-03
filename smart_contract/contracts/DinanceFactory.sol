@@ -1,10 +1,11 @@
 /* SPDX-License-Identifier: MIT */
 pragma solidity ^0.8.7;
 
-/* We are imporing DinancePool and Interface of DinancePool */
+/* We are imporing DinancePool and  */
 import "./DinancePool.sol";
 import "./DinanceAToken.sol";
 
+/* We are imporing DinancePool and Interface of DinancePool */
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 /* This is Dinance Factory Contract for making Dinance pool */
@@ -15,8 +16,8 @@ contract DinanceFactory {
     DinancePool public DinancePoolContract;
     DinanceAToken public dinanceAToken;
 
-    mapping(address => DinancePool) public DinancePoolAddress;
-    mapping(address => DinanceAToken) public AToken;
+    mapping(address => address) public Pool;
+    mapping(address => address) public AToken;
 
     uint256 public totalAmount;
 
@@ -38,7 +39,7 @@ contract DinanceFactory {
             DinancePoolContract.initialize(_tokenPools[i].tokenAddress);
 
             poolMarket.push(address(DinancePoolContract));
-            DinancePoolAddress[_tokenPools[i].tokenAddress] = DinancePoolContract;
+            Pool[_tokenPools[i].tokenAddress] = address(DinancePoolContract);
 
             dinanceAToken = new DinanceAToken(
                 _tokenPools[i].tokenAddress,
@@ -46,7 +47,7 @@ contract DinanceFactory {
                 _tokenPools[i].symbol
             );
 
-            AToken[_tokenPools[i].tokenAddress] = dinanceAToken;
+            AToken[_tokenPools[i].tokenAddress] = address(dinanceAToken);
 
             emit poolCreated(_tokenPools[i].tokenAddress, address(DinancePoolContract), poolMarket.length);
         }

@@ -5,7 +5,35 @@ import { useContext } from "react";
 
 const Header = () => {
 
+<<<<<<< HEAD
   const {metaMaskAccount,setMetaMaskAccount,connectWallet}= useContext(appDataState)
+=======
+  const [metaMaskAccount, setMetaMaskAccount] = useState("");
+  
+  const connectWallet = async () => {
+    try {
+      const provider = await detectEthereumProvider();
+
+      if (provider) {
+        const account = await provider.request({
+          method: "eth_requestAccounts",
+        });
+        const ethersProvider = new ethers.providers.Web3Provider(provider);
+        const signer = ethersProvider.getSigner();
+
+        setMetaMaskAccount(account[0]);
+        const DinanceFactoryContract = new ethers.Contract(DinanceFactoryAddress, DinanceFactoryABI, signer);
+        console.log(DinanceFactoryContract);
+        console.log(account);
+        console.log(signer);
+      } else {
+        alert("Please install metamask wallet!");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+>>>>>>> abd6e5ee99d2977153966dbbddcb18c5023badba
 
   const disConnectWallet = () => {
     setMetaMaskAccount("");
