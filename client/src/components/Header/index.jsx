@@ -7,7 +7,6 @@ import { DinanceFactoryAddress, DinanceFactoryABI } from "@/utils/constant.js"
 const Header = () => {
 
   const [metaMaskAccount, setMetaMaskAccount] = useState("");
-
   
   const connectWallet = async () => {
     try {
