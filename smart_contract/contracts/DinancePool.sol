@@ -96,11 +96,5 @@ contract DinancePool {
         require(borrower[msg.sender] == _amount, "you don't have debt!");
         IERC20(_token).transfer(address(this), _amount);
 
-        // uint256 amountAfterInterest = depositor[msg.sender] -
-        //     ((block.timestamp - borrowedTime[msg.sender]) * borrowInterest);
-        // IERC20().transfer(
-        //     msg.sender,
-        //     amountAfterInterest
-        // );
     }
 }

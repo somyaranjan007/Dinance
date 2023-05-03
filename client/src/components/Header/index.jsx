@@ -1,44 +1,18 @@
 import React, { useState } from "react";
 import Logo from "@/assets/Logo.png";
-import { ethers } from "ethers";
-import detectEthereumProvider from "@metamask/detect-provider";
-import { DinanceFactoryAddress, DinanceFactoryABI } from "@/utils/constant.js"
+import { appDataState } from "@/context";
+import { useContext } from "react";
 
 const Header = () => {
 
-  const [metaMaskAccount, setMetaMaskAccount] = useState("");
-
-  
-  const connectWallet = async () => {
-    try {
-      const provider = await detectEthereumProvider();
-
-      if (provider) {
-        const account = await provider.request({
-          method: "eth_requestAccounts",
-        });
-        const ethersProvider = new ethers.providers.Web3Provider(provider);
-        const signer = ethersProvider.getSigner();
-
-        setMetaMaskAccount(account[0]);
-        const DinanceFactoryContract = new ethers.Contract(DinanceFactoryAddress, DinanceFactoryABI, signer);
-        console.log(DinanceFactoryContract);
-        console.log(account);
-        console.log(signer);
-      } else {
-        alert("Please install metamask wallet!");
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  const {metaMaskAccount,setMetaMaskAccount,connectWallet}= useContext(appDataState)
 
   const disConnectWallet = () => {
     setMetaMaskAccount("");
   }
 
 
-  console.log(metaMaskAccount);
+  // console.log(metaMaskAccount);
 
   return (
     <div className="flex items-center justify-between px-2 h-[70px] pr-4 bg-[#21232f] text-white">
